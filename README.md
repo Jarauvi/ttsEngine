@@ -8,6 +8,7 @@ Model cannot be changed to another or it is lost and reinstall is needed.
 Model is used to convert the Finnish voice instructions of [Organic Maps](https://github.com/organicmaps/organicmaps) to god tier [Savonian](https://en.wikipedia.org/wiki/Savonian_people) accent! Check out [that repository](https://github.com/Jarauvi/organicmaps)
 
 Demonstration video:
+
 [![Watch the video](https://img.youtube.com/vi/nTjUuRwqrVk/0.jpg)](https://www.youtube.com/watch?v=nTjUuRwqrVk)
 
 ## Installation
