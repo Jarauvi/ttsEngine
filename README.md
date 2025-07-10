@@ -15,3 +15,5 @@ Demonstration video:
 - Download apk from Releases page
 - Allow phone to install apps from unknown sources
 - Install the apk
+- Start SherpaTTS for the first time - do not change the model! You can test output if you want
+- Make SherpaTTS default TTS engine in Android preferences: System -> Languages -> Text-to-speech output -> Preferred engine
