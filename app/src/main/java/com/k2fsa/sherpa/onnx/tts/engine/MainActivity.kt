@@ -2,6 +2,7 @@
 
 package com.k2fsa.sherpa.onnx.tts.engine
 
+import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFormat
@@ -65,6 +66,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.IOException
 
 const val TAG = "sherpa-onnx-tts-engine"
 
@@ -96,6 +98,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        copyAssetsFolderIfNeeded(this)
         super.onCreate(savedInstanceState)
         preferenceHelper = PreferenceHelper(this)
         langDB = LangDB.getInstance(this)
@@ -113,6 +116,31 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(this, ManageLanguagesActivity::class.java)
             startActivity(intent)
             finish()
+        }
+    }
+
+    private fun copyAssetsFolderIfNeeded(context: Context) {
+        val assetManager = context.assets
+        val destDir = File(context.getExternalFilesDir(null), "modelDir")
+
+        if (destDir.exists()) {
+            // Already copied
+            return
+        }
+
+        try {
+            val files = assetManager.list("finFI") ?: return
+            destDir.mkdirs()
+            for (filename in files) {
+                val inStream = assetManager.open("finFI/$filename")
+                val outFile = File(destDir, filename)
+                val outStream = outFile.outputStream()
+                inStream.copyTo(outStream)
+                inStream.close()
+                outStream.close()
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
