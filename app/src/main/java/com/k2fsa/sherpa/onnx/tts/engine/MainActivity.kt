@@ -103,7 +103,10 @@ class MainActivity : ComponentActivity() {
         preferenceHelper = PreferenceHelper(this)
         langDB = LangDB.getInstance(this)
         volume = preferenceHelper.getVolume()
-        Migrate.renameModelFolder(this)   //Rename model folder if "old" structure
+        if (File(this.getExternalFilesDir(null), "modelDir").exists()) {
+            Migrate.renameModelFolder(this)   //Rename model folder if "old" structure
+        }
+
         if (!preferenceHelper.getCurrentLanguage().equals("")) {
             TtsEngine.createTts(this, preferenceHelper.getCurrentLanguage()!!)
             initAudioTrack()
@@ -121,19 +124,36 @@ class MainActivity : ComponentActivity() {
 
     private fun copyAssetsFolderIfNeeded(context: Context) {
         val assetManager = context.assets
-        val destDir = File(context.getExternalFilesDir(null), "modelDir")
+        val modelDir = File(context.getExternalFilesDir(null), "modelDir")
 
-        if (destDir.exists()) {
-            // Already copied
+        if (modelDir.exists()) {
+            // ModelDir already copied
+            modelDir.delete()
+            return
+        }
+
+        val inputStream = assetManager.open("finFI/lang")
+        val modelData = inputStream.bufferedReader().readText().split("\n")
+        val lang = modelData[0].trim()
+        val country = modelData[1].trim()
+        val langDir = File(context.getExternalFilesDir(null), "$lang$country")
+
+        if (langDir.exists()) {
+            // Language already installed
+            return
+        }
+
+        if (modelDir.exists()) {
+            // ModelDir already copied
             return
         }
 
         try {
-            val files = assetManager.list("finFI") ?: return
-            destDir.mkdirs()
+            val files = assetManager.list("$lang$country") ?: return
+            modelDir.mkdirs()
             for (filename in files) {
-                val inStream = assetManager.open("finFI/$filename")
-                val outFile = File(destDir, filename)
+                val inStream = assetManager.open("$lang$country/$filename")
+                val outFile = File(modelDir, filename)
                 val outStream = outFile.outputStream()
                 inStream.copyTo(outStream)
                 inStream.close()
